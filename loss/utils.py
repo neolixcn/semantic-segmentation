@@ -126,7 +126,7 @@ class CrossEntropyLoss2d(nn.Module):
     def __init__(self, weight=None, ignore_index=cfg.DATASET.IGNORE_LABEL,
                  reduction='mean'):
         super(CrossEntropyLoss2d, self).__init__()
-        logx.msg("Using Cross Entropy Loss")
+        # logx.msg("Using Cross Entropy Loss")
         self.nll_loss = nn.NLLLoss(weight, reduction=reduction,
                                    ignore_index=ignore_index)
 

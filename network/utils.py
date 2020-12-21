@@ -99,7 +99,7 @@ class get_resnet(nn.Module):
         return s2_features, s4_features, x
 
 
-def get_trunk(trunk_name, output_stride=8):
+def get_trunk(trunk_name,pre_train_path="", output_stride=8):
     """
     Retrieve the network trunk and channel counts.
     """
@@ -130,14 +130,14 @@ def get_trunk(trunk_name, output_stride=8):
         s4_ch = -1
         high_level_ch = 2048
     elif trunk_name == 'hrnetv2':
-        backbone = hrnetv2.get_seg_model()
+        backbone = hrnetv2.get_seg_model_onnx(pre_train_path)
         high_level_ch = backbone.high_level_ch
         s2_ch = -1
         s4_ch = -1
     else:
         raise 'unknown backbone {}'.format(trunk_name)
 
-    logx.msg("Trunk: {}".format(trunk_name))
+    # logx.msg("Trunk: {}".format(trunk_name))
     return backbone, s2_ch, s4_ch, high_level_ch
 
 

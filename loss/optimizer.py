@@ -128,6 +128,9 @@ def restore_opt(optimizer, checkpoint):
     assert 'optimizer' in checkpoint, 'cant find optimizer in checkpoint'
     optimizer.load_state_dict(checkpoint['optimizer'])
 
+def restore_net_onnx(net, checkpoint):
+    assert 'state_dict' in checkpoint, 'cant find state_dict in checkpoint'
+    forgiving_state_restore_onnx(net, checkpoint['state_dict'])
 
 def restore_net(net, checkpoint):
     assert 'state_dict' in checkpoint, 'cant find state_dict in checkpoint'
@@ -149,6 +152,26 @@ def forgiving_state_restore(net, loaded_dict):
             new_loaded_dict[k] = loaded_dict[new_k]
         else:            
             logx.msg("Skipped loading parameter {}".format(k))
+    net_state_dict.update(new_loaded_dict)
+    net.load_state_dict(net_state_dict)
+    return net
+
+def forgiving_state_restore_onnx(net, loaded_dict):
+    """
+    Handle partial loading when some tensors don't match up in size.
+    Because we want to use models that were trained off a different
+    number of classes.
+    """
+
+    net_state_dict = net.state_dict()
+    new_loaded_dict = {}
+    for k in net_state_dict:
+        new_k = "module."+k
+        if new_k in loaded_dict and net_state_dict[k].size() == loaded_dict[new_k].size():
+            new_loaded_dict[k] = loaded_dict[new_k]
+        else:
+            print("Skipped loading parameter {}".format(k))
+            # logx.msg("Skipped loading parameter {}".format(k))
     net_state_dict.update(new_loaded_dict)
     net.load_state_dict(net_state_dict)
     return net
