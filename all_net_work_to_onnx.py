@@ -226,7 +226,17 @@ parser.add_argument('--supervised_mscale_loss_wt', type=float, default=None,
                     help='weighting for the supervised loss')
 parser.add_argument('--ocr_aux_loss_rmi', action='store_true', default=False,
                     help='allow rmi for aux loss')
-
+parser.add_argument('--onnx_hrnet_weight', type=str, default=None,
+                    help='path for pretrain hrnet weight')
+parser.add_argument('--onnx_ocrnet_weight', type=str, default=None,
+                    help='path for pretrain ocrnet weight')
+parser.add_argument('--onnx_input_width', type=int, default=1920,
+                    help='input width for export onnx ')
+parser.add_argument('--onnx_input_height', type=int, default=1080,
+                    help='input height for export onnx ')
+parser.add_argument('--onnx_output', type=str, default=None,
+                    help='output path  for export onnx ')
+                  
 
 
 args = parser.parse_args()
@@ -240,9 +250,9 @@ update_dataset_cfg(19,0)
 args.arch = "ocrnet.HRNet_Mscale_onnx"
 
 criterion, criterion_val = get_loss(args)
-checkpoint = torch.load("/home/weiliang/work/git_code/semantic-segmentation-main/model_and_data/seg_weights/cityscapes_ocrnet.HRNet_Mscale_outstanding-turtle.pth",
+checkpoint = torch.load(args.onnx_ocrnet_weight,
                         map_location=torch.device('cpu'))
-pretrain_path = "/home/weiliang/work/git_code/semantic-segmentation-main/model_and_data/seg_weights/hrnetv2_w48_imagenet_pretrained.pth"
+pretrain_path = args.onnx_hrnet_weight
 net = network.get_net_onnx(args,pretrain_path, criterion)
 restore_net_onnx(net, checkpoint)
 
@@ -253,9 +263,9 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 net.eval()
 net.to(device)
 import cv2
-image_bgr= cv2.imread("/home/weiliang/work/git_code/semantic-segmentation-main/imgs/test_imgs/1.png_bak")
+image_bgr= cv2.imread("/home/liweiliang/project/git_code/semantic-segmentation/imgs/test_imgs/nyc.jpg")
 image_ori = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB)#np.array().astype(np.float32) #.reshape(1080,1920,3)
-# image = cv2.resize(image_ori, (960,540),)
+image_ori = cv2.resize(image_ori, (args.onnx_input_width,args.onnx_input_height),)
 # inputs =torch.from_numpy(image)
 transform_test = transforms.Compose([
     transforms.ToTensor(),
@@ -264,7 +274,8 @@ transform_test = transforms.Compose([
 # image = cv2.resize(image_ori, (960,540),)
 img_tensor = transform_test(image_ori).unsqueeze(0)
 # print(img_tensor.shape)
-
+if  not os.path.exists(args.onnx_output):
+      os.makedirs(args.onnx_output)
 with torch.no_grad():
     inputs = img_tensor.to(device)
     inputs = inputs.permute(0, 2, 3, 1)
@@ -273,7 +284,7 @@ with torch.no_grad():
     output_names = [ 'output']
 
     torch.onnx.export(net, inputs,
-                      f'/home/weiliang/work/git_code/semantic-segmentation-main/onnx_result/ocrnet_hwc.onnx',
+                      args.onnx_output+'ocrnet_hwc.onnx',
                       verbose=True,
                       input_names=['input'],
                       output_names=output_names,
