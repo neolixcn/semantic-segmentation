@@ -195,7 +195,7 @@ def torch_version_float():
     version_re = re.search(r'^([0-9]+\.[0-9]+)', version_str)
     if version_re:
         version = float(version_re.group(1))
-        logx.msg(f'Torch version: {version}, {version_str}')
+        # logx.msg(f'Torch version: {version}, {version_str}')
     else:
         version = 1.0
         logx.msg(f'Can\'t parse torch version ({version}), assuming {version}')
@@ -372,7 +372,7 @@ def update_dataset_cfg(num_classes, ignore_label):
     cfg.immutable(False)
     cfg.DATASET.NUM_CLASSES = num_classes
     cfg.DATASET.IGNORE_LABEL = ignore_label
-    logx.msg('num_classes = {}'.format(num_classes))
+    # logx.msg('num_classes = {}'.format(num_classes))
     cfg.immutable(True)
 
 

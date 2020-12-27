@@ -1,3 +1,13 @@
+### 转换onnx模型
+```shell
+python all_net_work_to_onnx.py --onnx_ocrnet_weight ./weights/cityscapes_ocrnet.HRNet_Mscale_outstanding-turtle.pth --onnx_hrnet_weight ./weights/hrnetv2_w48_imagenet_pretrained.pth  --onnx_input_width 960 --onnx_input_height 540 --onnx_output ./test_output_path/
+```
+*  调用all_net_work_to_onnx.py执行onnx文件转换
+* --onnx_ocrnet_weight  ocrnent预训练模型路径
+* --onnx_hrnet_weight   backbone的hrnet预训练模型路径
+* --onnx_input_width 转换后onnx模型输入图像的宽度
+* --onnx_input_height 转换后onnx模型输入图像的高度
+*  --onnx_output 输出onnx模型的存放路径
 ### [Paper](https://arxiv.org/abs/2005.10821) | [YouTube](https://youtu.be/odAGA7pFBGA)  | [Cityscapes Score](https://www.cityscapes-dataset.com/method-details/?submissionID=7836) <br>
 
 Pytorch implementation of our paper [Hierarchical Multi-Scale Attention for Semantic Segmentation](https://arxiv.org/abs/2005.10821).<br>

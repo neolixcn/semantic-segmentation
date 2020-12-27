@@ -449,7 +449,7 @@ class HighResolutionNet(nn.Module):
         return None, None, feats
 
     def init_weights(self, pretrained=cfg.MODEL.HRNET_CHECKPOINT):
-        logx.msg('=> init weights from normal distribution')
+        # logx.msg('=> init weights from normal distribution')
         for name, m in self.named_modules():
             if any(part in name for part in {'cls', 'aux', 'ocr'}):
                 # print('skipped', name)
@@ -480,5 +480,11 @@ class HighResolutionNet(nn.Module):
 def get_seg_model():
     model = HighResolutionNet()
     model.init_weights()
+
+    return model
+
+def get_seg_model_onnx(hrnet_path):
+    model = HighResolutionNet()
+    model.init_weights(hrnet_path)
 
     return model
